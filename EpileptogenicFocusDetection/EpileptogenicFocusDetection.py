@@ -27,9 +27,9 @@ class SliceletMainFrame(qt.QFrame):
   def setSlicelet(self, slicelet):
     self.slicelet = slicelet
 
-  def hideEvent(self, event):
+  def closeEvent(self, event):
     self.slicelet.disconnect()
-
+    
     import gc
     refs = gc.get_referrers(self.slicelet)
     if len(refs) > 1:
