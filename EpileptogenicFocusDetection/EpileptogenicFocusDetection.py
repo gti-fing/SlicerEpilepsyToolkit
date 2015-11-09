@@ -730,7 +730,7 @@ class EpileptogenicFocusDetectionSlicelet(object):
         if (subtractionOutputVolumeNode is not None) and (maskVolumeNode is not None):
           self.computeStdDevSISCOMSliderBounds(subtractionOutputVolumeNode,maskVolumeNode )
           self.showActivations(self.backgroundVolumeNode, self.SISCOMForegroundVolumeNode) 
-      print "End of onStep3_fociDetectionCollapsibleButtonClicked"
+      #print "End of onStep3_fociDetectionCollapsibleButtonClicked"
           
   def onStep3A_SISCOMDetectionCollapsibleButtonClicked(self, collapsed):
     self.onSiscomHideOverlayButtonClicked()
@@ -769,6 +769,7 @@ class EpileptogenicFocusDetectionSlicelet(object):
     result =self.logic.subtractImages()  
     #result= self.logic.subtractImages(ictalVolumeNode,basalVolumeNode, subtractionOutputVolumeNode) 
     if result==True:
+      self.siscomOverlayButton.setEnabled(self.logic.IsSISCOMOutput) 
       maskVolumeNode=slicer.util.getNode(self.logic.BASAL_ICTAL_MASK_NAME)
       subtractionOutputVolumeNode=slicer.util.getNode(self.logic.ICTAL_BASAL_SUBTRACTION)
       if maskVolumeNode is not None:
@@ -789,17 +790,16 @@ class EpileptogenicFocusDetectionSlicelet(object):
       
       self.backgroundVolumeNode = backgroundVolumeNode
       self.SISCOMForegroundVolumeNode = foregroundVolumeNode
-      
-      self.siscomOverlayButton.setEnabled(self.logic.IsSISCOMOutput)
+
   #---------------------------------------------------------------------------------------
   
   def computeStdDevSISCOMSliderBounds(self, subtractionOutputVolumeNode,maskVolumeNode ):
     data=slicer.util.array(subtractionOutputVolumeNode.GetName())
     maximumValue = numpy.int(data.max())          
     stddev=data.std()
-    print 'standard deviation = ' + str(stddev)
+    #print 'standard deviation = ' + str(stddev)
     stddevInside_mask = self.logic.computeStdDevInsideMask(subtractionOutputVolumeNode, maskVolumeNode)
-    print 'standard deviation inside mask = ' + str(stddevInside_mask)
+    #print 'standard deviation inside mask = ' + str(stddevInside_mask)
     self.stdDevSISCOMSlider.minimum = 0;
     self.stdDevSISCOMSlider.maximum = maximumValue / stddevInside_mask;      
     self.stdDevSISCOMSlider.singleStep = 0.5
@@ -947,7 +947,7 @@ class EpileptogenicFocusDetectionSlicelet(object):
       self.currentStatusLabel.setText(self.aContrarioDetection.userMessage)    
       slicer.app.processEvents()  
      
-     
+    self.aContrarioOverlayButton.setEnabled(self.aContrarioDetection.IsAContrarioOutput) 
     if self.suspendAContrario == True:
       l._Thread__stop()   
         
@@ -970,7 +970,6 @@ class EpileptogenicFocusDetectionSlicelet(object):
       self.aContrarioForegroundVolumeNode = foregroundVolumeNode
     
     self.aContrarioDetectionButton.setEnabled(True)  
-    self.aContrarioOverlayButton.setEnabled(self.aContrarioDetection.IsAContrarioOutput)
       
   def onCompareDetectionsButtonClicked(self):
     mriVolumeNode = slicer.util.getNode(self.logic.MRI_VOLUME_NAME)  
@@ -1147,4 +1146,8 @@ if __name__ == "__main__":
   print( sys.argv )
 
   mainFrame = qt.QFrame()
+  mainFrame.windowTitle = "Epileptogenic Focus Detection"
+  mainFrame.setMinimumWidth(1200)
   slicelet = EpileptogenicFocusDetectionSlicelet(mainFrame)
+  
+
